@@ -1,16 +1,37 @@
 #include <iostream>
+#include <filesystem>
 #include <cstdlib>
 #include <string>
 
+// ANSI DEFINE
+#define RESET   "\033[0m"
+#define BLACK   "\033[30m"      /* Black */
+#define RED     "\033[31m"      /* Red */
+#define GREEN   "\033[32m"      /* Green */
+#define YELLOW  "\033[33m"      /* Yellow */
+#define BLUE    "\033[34m"      /* Blue */
+#define MAGENTA "\033[35m"      /* Magenta */
+#define CYAN    "\033[36m"      /* Cyan */
+#define WHITE   "\033[37m"      /* White */
+
+namespace fs = std::filesystem;
+
 int main(int argc, char** argv) {
-    char* path = std::getenv("PWD"); // Get Current path
-    
-    if (path != nullptr) {
-        std::string currentPath(path);
-        std::cout << "Currenr Path:" << currentPath << std::endl;
-    } else {
-        std::cerr << "Cannot Get Current Path" << std::endl;
+    char* path = std::getenv("PWD"); 
+
+    fs::path currentPath(path);
+
+    std::cout << MAGENTA << "currentPath: " << BLUE << currentPath << "\n" << GREEN;
+
+    uint64_t filenum = 0;
+
+    for (const auto& entry : fs::directory_iterator(currentPath)) {
+        if (fs::is_directory(entry.path())) continue;
+        std::cout << entry.path().filename() << "\n";
+        filenum++;
     }
+
+    std::cout << MAGENTA << "total files num: " << GREEN << filenum << '\n';
 
     return 0;
 }
