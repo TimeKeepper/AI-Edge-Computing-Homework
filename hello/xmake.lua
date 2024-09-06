@@ -4,6 +4,7 @@ target("hello")
 set_kind("binary")
 add_files("src/*.cpp")
 add_includedirs("../include/")
+target_end()
 --
 -- If you want to known more usage about xmake, please see https://xmake.io
 --
