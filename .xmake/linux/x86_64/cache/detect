@@ -1,6 +1,0 @@
-{
-    find_program = {
-        ping = "/usr/bin/ping",
-        xrepo = "/home/wenjiu/.local/bin/xrepo"
-    }
-}
