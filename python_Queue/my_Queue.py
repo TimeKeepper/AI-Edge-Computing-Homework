@@ -1,4 +1,4 @@
-def ring_Queue(object):
+class ring_Queue(object):
     def __init__(self, size):
         self.size = size
         self.queue = [None] * size
