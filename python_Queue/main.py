@@ -17,10 +17,11 @@ stop_flag = False
 def image_enquene():
     cur = time.time()
     i = 0
+    freq = 4
     while i < len(data):
         if stop_flag:
             break
-        if time.time() - cur < 0.25:
+        if time.time() - cur < 1/freq:
             continue
         q.enqueue(data[i].reshape(28, 28))
         i += 1
@@ -31,10 +32,17 @@ image_data = np.zeros((28, 28))
 
 def image_dequene():
     cur = time.time()
+    freq = 2
     while True:
         if stop_flag:
             break
-        if time.time() - cur < 0.5:
+        if q.is_full() and freq == 2:
+            print('speed up')
+            freq = 8
+        elif q.is_empty() and freq == 8:
+            print('speed down')
+            freq = 2
+        if time.time() - cur < 1/freq:
             continue
         cur = time.time()
         global image_data
