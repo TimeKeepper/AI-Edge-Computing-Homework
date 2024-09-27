@@ -30,6 +30,8 @@ trainloader = torch.utils.data.DataLoader(trainset, batch_size=64, shuffle=True)
 testset = torchvision.datasets.MNIST(root='./data', train=False, download=True, transform=transform)
 testloader = torch.utils.data.DataLoader(testset, batch_size=1, shuffle=False)
 
+valset = torchvision.datasets.MNIST(root='./data', train=False, download=True, transform=transform)
+valloader = torch.utils.data.DataLoader(valset, batch_size=64, shuffle=False)
 # 定义神经网络模型
 class Net(nn.Module):
 	def __init__(self):
@@ -77,7 +79,7 @@ def train():
 
 			running_loss += loss.item()
 			if i % 100 == 99:  # 每100个batch打印一次loss
-				print(f'[Epoch {epoch + 1}, Batch {i + 1}] loss: {running_loss / 100:.3f}')
+				print(f'[Epoch {epoch + 1}, Batch {i + 1}] loss: {running_loss / 100:.8f}')
 				running_loss = 0.0
 				show_update(inputs[0].cpu().numpy().reshape(28, 28))
 
@@ -110,3 +112,17 @@ def test():
 			if predicted != labels:
 				print(f'error: labels: {labels.item()}, predickted: {predicted.item()}')
 				break
+
+def val():
+    correct = 0
+    total = 0
+    with torch.no_grad():
+        for data in valloader:
+            images, labels = data
+            images, labels = images.to(device), labels.to(device)
+            outputs = net(images)
+            _, predicted = torch.max(outputs.data, 1)
+            total += labels.cpu().size(0)
+            correct += (predicted == labels).sum().item()
+
+    print(f'Accuracy of the network on the 10000 test images: {100 * correct / total:.4f}%')
