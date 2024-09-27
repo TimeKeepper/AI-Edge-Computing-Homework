@@ -25,7 +25,7 @@ else:
 transform = transforms.Compose([transforms.ToTensor(), transforms.Normalize((0.5,), (0.5,))])
 
 trainset = torchvision.datasets.MNIST(root='./data', train=True, download=True, transform=transform)
-trainloader = torch.utils.data.DataLoader(trainset, batch_size=64, shuffle=True)
+trainloader = torch.utils.data.DataLoader(trainset, batch_size=512, shuffle=True)
 
 testset = torchvision.datasets.MNIST(root='./data', train=False, download=True, transform=transform)
 testloader = torch.utils.data.DataLoader(testset, batch_size=1, shuffle=False)
@@ -34,27 +34,34 @@ valset = torchvision.datasets.MNIST(root='./data', train=False, download=True, t
 valloader = torch.utils.data.DataLoader(valset, batch_size=64, shuffle=False)
 # 定义神经网络模型
 class Net(nn.Module):
-	def __init__(self):
-		super(Net, self).__init__()
-		self.fc1 = nn.Linear(28 * 28, 512)
-		self.fc2 = nn.Linear(512, 256)
-		self.fc3 = nn.Linear(256, 10)
+    def __init__(self):
+        super(Net, self).__init__()
+        self.fc1 = nn.Linear(28 * 28, 1024)
+        self.fc2 = nn.Linear(1024, 2048)
+        self.fc3 = nn.Linear(2048, 1024)
+        self.fc4 = nn.Linear(1024, 512)
+        self.fc5 = nn.Linear(512, 256)
+        self.fc6 = nn.Linear(256, 10)
 
-	def forward(self, x):
-		x = x.view(-1, 28 * 28)
-		x = torch.relu(self.fc1(x))
-		x = torch.relu(self.fc2(x))
-		x = self.fc3(x)
-		return x
+    def forward(self, x):
+        x = x.view(-1, 28 * 28)
+        x = torch.relu(self.fc1(x))
+        x = torch.relu(self.fc2(x))
+        x = torch.relu(self.fc3(x))
+        x = torch.relu(self.fc4(x))
+        x = torch.relu(self.fc5(x))
+        x = self.fc6(x)
+        return x
 
+import os
 checkpoint_path = 'net.pth'
-if checkpoint_path is not None:
+if os.path.exists(checkpoint_path):
 	checkpoint = torch.load(checkpoint_path, weights_only=True)
 
 # 定义损失函数和优化器
 net = Net().to(device)
-if checkpoint_path is not None:
-	net.load_state_dict(checkpoint)
+if os.path.exists(checkpoint_path):	
+    net.load_state_dict(checkpoint)
 
 criterion = nn.CrossEntropyLoss()
 
@@ -62,7 +69,7 @@ optimizer = optim.SGD(net.parameters(), lr=0.01, momentum=0.9)
 
 def train():
 	# 训练模型
-	for epoch in range(10):  # 训练10个epoch
+	for epoch in range(100):  # 训练10个epoch
 		running_loss = 0.0
 		for i, data in enumerate(trainloader, 0):
 			if stop_flag:
